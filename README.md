@@ -1,4 +1,4 @@
-Movie Theater Management System
+Movie Theater Management System     
 
 Kazi Refaet Ullah 2131510642 
 Abdullah Al Amin 1912662042 
