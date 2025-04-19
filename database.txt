@@ -1,0 +1,87 @@
+-- Drop and recreate the database
+DROP DATABASE IF EXISTS movie_theater_db;
+CREATE DATABASE movie_theater_db;
+USE movie_theater_db;
+
+-- USERS TABLE
+CREATE TABLE users (
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    role ENUM('Customer', 'Admin', 'Staff') NOT NULL
+);
+
+-- MOVIES TABLE
+CREATE TABLE movies (
+    movie_id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(100) NOT NULL,
+    genre VARCHAR(50),
+    duration INT, -- in minutes
+    description TEXT
+);
+
+-- SHOWTIMES TABLE
+CREATE TABLE showtimes (
+    show_id INT AUTO_INCREMENT PRIMARY KEY,
+    movie_id INT NOT NULL,
+    screen_no INT NOT NULL,
+    time DATETIME NOT NULL,
+    price DECIMAL(8,2) NOT NULL,
+    FOREIGN KEY (movie_id) REFERENCES movies(movie_id) ON DELETE CASCADE
+);
+
+-- SEATS TABLE (Real-time seat selection)
+CREATE TABLE seats (
+    seat_id INT AUTO_INCREMENT PRIMARY KEY,
+    show_id INT NOT NULL,
+    seat_no VARCHAR(10) NOT NULL,
+    is_booked BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY (show_id) REFERENCES showtimes(show_id) ON DELETE CASCADE,
+    UNIQUE (show_id, seat_no)
+);
+
+-- TICKETS TABLE
+CREATE TABLE tickets (
+    ticket_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    show_id INT NOT NULL,
+    seat_no VARCHAR(10) NOT NULL,
+    status ENUM('Booked', 'Cancelled') DEFAULT 'Booked',
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (show_id) REFERENCES showtimes(show_id) ON DELETE CASCADE
+);
+
+-- PAYMENTS TABLE
+CREATE TABLE payments (
+    payment_id INT AUTO_INCREMENT PRIMARY KEY,
+    ticket_id INT NOT NULL,
+    amount DECIMAL(8, 2) NOT NULL,
+    status ENUM('Success', 'Failed', 'Refunded') DEFAULT 'Success',
+    payment_method ENUM('CreditCard', 'DebitCard', 'MobilePayment', 'Cash'),
+    FOREIGN KEY (ticket_id) REFERENCES tickets(ticket_id) ON DELETE CASCADE
+);
+
+-- REVIEWS TABLE
+CREATE TABLE reviews (
+    review_id INT AUTO_INCREMENT PRIMARY KEY,
+    movie_id INT NOT NULL,
+    user_id INT NOT NULL,
+    rating INT CHECK (rating >= 1 AND rating <= 5),
+    comment TEXT,
+    FOREIGN KEY (movie_id) REFERENCES movies(movie_id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+
+-- OPTIONAL: REPORTS TABLE
+CREATE TABLE reports (
+    report_id INT AUTO_INCREMENT PRIMARY KEY,
+    generated_by INT,
+    report_type VARCHAR(50),
+    content TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (generated_by) REFERENCES users(user_id)
+);
+ALTER TABLE movies
+ADD poster VARCHAR(255);
+

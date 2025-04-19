@@ -1,0 +1,6 @@
+addmovie.php = Singleton Design Pattern
+book_ticket.php = Observer Design Pattern
+edit_movie.php = Decorator Design Pattern
+add_showtime.php=Factory Design Pattern
+view_users.php=Proxy Design Pattern
+create_report.php=facade design pattern
